@@ -1,10 +1,16 @@
+'''
+Raspberry Pico W weather station for University of Oulu IoT course
+'''
+
+import ssl
+from collections import deque
+from time import sleep
+
 import config
 import dht
 import networking
-import ssl
 from machine import Pin, I2C
-from bmp280 import *
-from time import sleep
+from bmp280 import BMP280, BMP280_CASE_INDOOR
 from umqtt.robust import MQTTClient
 
 PICO_LED = Pin("LED", Pin.OUT)
@@ -41,16 +47,16 @@ def init_mqtt() -> MQTTClient:
 
     # Load LetsEncrypt ISRG Root X1 CA certificate
     with open("isrgrootx1.der", "rb") as file:
-        CA_DER = file.read()
-    
+        ca_der = file.read()
+
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    
+
     # If certificate verification isn't needed or is broken, use CERT_OPTIONAL
     # context.verify_mode = ssl.CERT_OPTIONAL
     context.verify_mode = ssl.CERT_REQUIRED
-    context.load_verify_locations(cadata=CA_DER)
+    context.load_verify_locations(cadata=ca_der)
 
-    client = MQTTClient(
+    mqtt_client = MQTTClient(
         client_id=config.MQTT_CLIENT_ID,
         server=config.MQTT_HOST,
         port=config.MQTT_PORT,
@@ -61,24 +67,24 @@ def init_mqtt() -> MQTTClient:
     )
 
     PICO_LED.on()
-    client.connect()
+    mqtt_client.connect()
     PICO_LED.off()
 
     # Subscribe to "pico/led" topic
-    client.set_callback(mqtt_callback)
-    client.subscribe("pico/led")
-    return client
+    mqtt_client.set_callback(mqtt_callback)
+    mqtt_client.subscribe("pico/led")
+    return mqtt_client
 
 try:
     networking.connect(PICO_LED)
-    
+
     client = init_mqtt()
     bmp, dht_sensor = init_sensors()
-    
+
     while True:
         # Network heartbeat to verify WLAN is up
-        networking.heartbeat()
-        
+        networking.heartbeat(PICO_LED)
+
         dht_sensor.measure()
         temp = bmp.temperature
         pres = bmp.pressure / 100
@@ -94,7 +100,5 @@ try:
         # Check for incoming MQTT messages
         client.check_msg()
         sleep(1)
-except Exception as e:
+except (OSError, ValueError) as e:
     print('Error when running program:', e)
-
-
