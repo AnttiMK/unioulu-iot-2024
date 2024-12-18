@@ -1,0 +1,8 @@
+[wokwi]
+version = 1
+firmware = './wokwi/RPI_PICO_W-20241025-v1.24.0.uf2'
+elf = ''
+
+[[chip]]
+name = "bmp280"
+binary = "./wokwi/bmp280.chip.wasm"

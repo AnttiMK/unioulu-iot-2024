@@ -1,0 +1,23 @@
+{
+    "name": "BMP280",
+    "author": "Antti Koponen",
+    "pins": [
+      "VCC",
+      "GND",
+      "SCL",
+      "SDA",
+      "NC",
+      "SDO",
+      "","","","",""
+    ],
+    "controls": [
+    {
+      "id": "temp",
+      "label": "Temperature",
+      "type": "range",
+      "min": 0,
+      "max": 1048576,
+      "step": 1
+    }
+  ]
+  }

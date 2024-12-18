@@ -1,0 +1,23 @@
+{
+    "version": 1,
+    "author": "Antti Koponen",
+    "editor": "wokwi",
+    "parts": [
+      { "type": "board-pi-pico-w", "id": "pico", "top": 0, "left": 0, "attrs": {} },
+      { "type": "chip-bmp280", "id": "chip1", "top": 29.82, "left": 244.8, "attrs": {} },
+      { "type": "wokwi-dht22", "id": "dht1", "top": -210.9, "left": -5.4, "attrs": {} }
+    ],
+    "connections": [
+      [ "pico:GP0", "$serialMonitor:RX", "", [] ],
+      [ "pico:GP1", "$serialMonitor:TX", "", [] ],
+      [ "dht1:SDA", "pico:GP2", "blue", [ "v38.4", "h-38.3", "v99.25" ] ],
+      [ "dht1:VCC", "pico:3V3", "red", [ "v48", "h86.4", "v89.65" ] ],
+      [ "chip1:VCC", "pico:3V3", "red", [ "h-144", "v12.85" ] ],
+      [ "chip1:GND", "pico:GND.7", "black", [ "h-134.4", "v32.05" ] ],
+      [ "chip1:SCL", "pico:GP21", "orange", [ "h-124.8", "v80.05" ] ],
+      [ "chip1:SDA", "pico:GP20", "gold", [ "h-115.2", "v80.05" ] ],
+      [ "chip1:SDO", "pico:GND.5", "blue", [ "h-105.6", "v89.61" ] ],
+      [ "dht1:GND", "pico:GND.8", "black", [ "v38.4", "h48", "v86.4" ] ]
+  ],
+    "dependencies": {}
+  }
