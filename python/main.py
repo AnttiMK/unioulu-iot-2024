@@ -75,11 +75,25 @@ def init_mqtt() -> MQTTClient:
     mqtt_client.subscribe("pico/led")
     return mqtt_client
 
+def calc_movavg(values: deque, new_value: float) -> float:
+    '''
+    Calculates moving average for a set of values.
+    :param values: deque containing previous values
+    :param new_value: the latest value to calculate against
+    :return: the moving average of the humidity readings
+    '''
+    values.append(new_value)
+    return sum(values) / len(values)
+
 try:
     networking.connect(PICO_LED)
 
     client = init_mqtt()
     bmp, dht_sensor = init_sensors()
+
+    # Deque size determines moving average window size
+    humidity_readings = deque([], 4)
+    pressure_readings = deque([], 6)
 
     while True:
         # Network heartbeat to verify WLAN is up
@@ -89,12 +103,16 @@ try:
         temp = bmp.temperature
         pres = bmp.pressure / 100
         hum = dht_sensor.humidity()
+        hum_smooth = calc_movavg(humidity_readings, hum)
+        pres_smooth = calc_movavg(pressure_readings, pres)
+
         print(f"Temperature: {temp:.2f} °C")
         print(f"Pressure: {pres:.2f} hPa")
         print(f"Humidity: {hum:.1f} %")
+        print(f"Humidity (3avg): {hum_smooth:.1f} %")
 
         # Publish sensor data to MQTT broker
-        client.publish("sensor/data", f'{temp:.2f},{pres:.2f},{hum:.1f}')
+        client.publish("sensor/data", f'{temp:.2f},{pres_smooth:.2f},{hum_smooth:.1f}')
         sleep(1)
 
         # Check for incoming MQTT messages
