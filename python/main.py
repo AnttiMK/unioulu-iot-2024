@@ -85,6 +85,16 @@ def calc_movavg(values: deque, new_value: float) -> float:
     values.append(new_value)
     return sum(values) / len(values)
 
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    '''
+    Clamp a value between a minimum and maximum value.
+    :param value: the value to clamp
+    :param min: the minimum value
+    :param max: the maximum value
+    :return: the clamped value
+    '''
+    return max(min_value, min(value, max_value))
+
 try:
     networking.connect(PICO_LED)
 
@@ -100,9 +110,9 @@ try:
         networking.heartbeat(PICO_LED)
 
         dht_sensor.measure()
-        temp = bmp.temperature
-        pres = bmp.pressure / 100
-        hum = dht_sensor.humidity()
+        temp = clamp(bmp.temperature, -40, 80)
+        pres = clamp(bmp.pressure / 100, 900, 1100) # Pa to hPa
+        hum = clamp(dht_sensor.humidity(), 0, 100)
         hum_smooth = calc_movavg(humidity_readings, hum)
         pres_smooth = calc_movavg(pressure_readings, pres)
 
