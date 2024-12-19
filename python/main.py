@@ -9,7 +9,7 @@ from time import sleep
 import config
 import dht
 import networking
-from machine import Pin, I2C
+from machine import Pin, I2C, WDT
 from bmp280 import BMP280, BMP280_CASE_INDOOR
 from umqtt.robust import MQTTClient
 
@@ -96,6 +96,10 @@ def clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(value, max_value))
 
 try:
+    # Enable 30s watchdog timer to reset the Pico if it hangs
+    wdt = WDT(timeout=30000)
+    wdt.feed()
+
     networking.connect(PICO_LED)
 
     client = init_mqtt()
@@ -106,6 +110,9 @@ try:
     pressure_readings = deque([], 6)
 
     while True:
+        # Watchdog
+        wdt.feed()
+
         # Network heartbeat to verify WLAN is up
         networking.heartbeat(PICO_LED)
 
