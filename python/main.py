@@ -129,7 +129,7 @@ try:
         print(f"Humidity (3avg): {hum_smooth:.1f} %")
 
         # Publish sensor data to MQTT broker
-        client.publish("sensor/data", f'{temp:.2f},{pres_smooth:.2f},{hum_smooth:.1f}')
+        client.publish("sensor/data", f'{temp:.2f},{pres_smooth:.2f},{hum_smooth:.1f}', qos=1)
         sleep(1)
 
         # Check for incoming MQTT messages
