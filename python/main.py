@@ -1,5 +1,6 @@
 '''
 Raspberry Pico W weather station for University of Oulu IoT course
+Author: Antti Koponen
 '''
 
 import ssl
@@ -9,7 +10,7 @@ from time import sleep
 import config
 import dht
 import networking
-from machine import Pin, I2C, WDT
+from machine import Pin, I2C, WDT, reset
 from bmp280 import BMP280, BMP280_CASE_INDOOR
 from umqtt.robust import MQTTClient
 
@@ -137,3 +138,4 @@ try:
         sleep(1)
 except (OSError, ValueError) as e:
     print('Error when running program:', e)
+    reset()

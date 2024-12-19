@@ -1,6 +1,7 @@
 '''
 Networking functions
 Inspired by https://projects.raspberrypi.org/en/projects/get-started-pico-w/2
+Author: Antti Koponen
 '''
 
 from time import sleep
